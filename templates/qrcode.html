@@ -1,0 +1,23 @@
+{% extends 'layoutAdmin.html' %}
+
+{% block body %}
+<div>
+    <!-- <p>http://127.0.0.1:5000/bill/{{rand}}</p> -->
+    <img src="{{ qrcode("http://127.0.0.1:5000/bill/"+rand)}}">
+    <h1>Thank You ! Visit Again</h1>
+    <a button class="btn btn-success" href="/select_store">Generate New</a></button>
+    <a button class="btn btn-success" href="/{{rand}}/payment">Payment</a></button>
+
+
+</div>
+
+
+{% from "includes/_formhelpers.html" import render_field %}
+  <form method="POST" action="">
+    <div class="form-group">
+      {{render_field(form.email, class_="form-control")}}
+    </div>
+    <p><input type="submit" class="btn btn-primary" value="Sent Mail"></p>
+  </form>
+
+{% endblock %}

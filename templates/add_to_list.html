@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<div class="container">
+    {% from "includes/_formhelpers.html" import render_field %}
+
+        <form>
+       
+            <a button class="btn btn-success" href="javascript:history.back()">Add to list</a></button>
+          <a button class="btn btn-success" href="/qrcode/{{rand}}" target="_blank">Submit</a></button>
+
+        </form>
+        <p>UID :{{rand}}</p>
+
+</div>
+<style>
+  p{
+    text-align: center;
+    font-weight: bold;
+  }
+</style>
+      
+
+      <hr>
+  <table class="table table-striped">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>upc</th>
+      <th>qty</th>
+      <th>price</th>
+      <th>Total</th>
+
+      <th></th>
+    </tr>
+    {% for article in articles %}
+      <tr>
+        <td>{{article.sid}}</td>
+        <td>{{article.name}}</td>
+        <td>{{article.upc}}</td>
+        <td>{{article.qty}}</td>
+        <td>{{article.price}}</td>
+        <td>{{article.total}}</td>
+
+        <!-- <td><a href="edit_advertiser/{{article.id}}" class="btn btn-default pull-right">Edit</a></td> -->
+        <td>
+          <form action="{{url_for('delete_pos_product', name=article.name, rand=rand)}}"class="btn btn-default pull-right" method="post">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="submit" value="X" class="btn btn-danger">
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    <tr>
+        <td style="text-align:right; font-weight: bold;" colspan="5">Amount: {{totalprice}}</td>
+      </tr>
+    </table>
+{% endblock %}
+
+

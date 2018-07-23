@@ -1,0 +1,37 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Dashboard <small> Welcome {{session.username}}</small></h1>
+  <!-- <a class="btn btn-success" href="/add_product"> Add Products</a> -->
+
+  <hr>
+  <table class="table table-striped">
+    <tr>
+      <th>Store ID</th>
+      <th>Name</th>
+      <th>UPC</th>
+      <th>Stock</th>
+      <th>Price</th>
+      <th></th>
+    </tr>
+    {% for article in articles %}
+      <tr>
+        <td>{{article.sid}}</td>
+        <td>{{article.name}}</td>
+        <td>{{article.upc}}</td>
+        <td>{{article.stock}}</td>
+        <td>{{article.price}}</td>
+       
+        <!-- <td>{{article.title}}</td>
+        <td>{{article.author}}</td>
+        <td>{{article.create_date}}</td> -->
+        <td>
+          <form action="{{url_for('delete_product',sid=article.sid,name=article.name)}}" method="post">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="submit" value="Delete" class="btn btn-danger">
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

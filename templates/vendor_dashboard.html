@@ -1,0 +1,54 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <h1>Dashboard <small> Welcome {{session.username}}</small></h1>
+  <!-- <a class="btn btn-success" href="/add_vendor"> Create Store</a> -->
+  <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Options
+    <span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      <li><a href="/view_store">View Store</a></li>
+      <li><a href="/create_store">Create Store</a></li>
+    </ul>
+    </div>
+    <div class="dropdown">
+    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" style="margin:-2.75% 10% 2% 25%;">Advertiser
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu" style="margin:-1.75% 10% 2% 25%;">
+          <li><a href="/advertiser_dash">View Advertisers</a></li>
+          <li><a href="/add_advertiser">Add Advertiser</a></li>
+        </ul>
+    </div>
+  
+     <a button class="btn btn-success" href="/template">Set Templates</a></button>
+  
+
+ 
+  <hr>
+  <table class="table table-striped">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Contact</th>
+      <th>Email</th>
+      <th></th>
+      <th></th>
+
+    </tr>
+    {% for article in articles %}
+      <tr>
+        <td>{{article.id}}</td>
+        <td>{{article.name}}</td>
+        <td>{{article.contact}}</td>
+        <td>{{article.email}}</td>
+        <td><a href="edit_advertiser/{{article.id}}" class="btn btn-default pull-right">Edit</a></td>
+        <td>
+          <form action="{{url_for('delete_advertiser', id=article.id)}}" method="post">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="submit" value="Delete" class="btn btn-danger">
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

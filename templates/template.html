@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="container">
+        <h2>Templates</h2>
+        <a><img src="/static/A.jpg" width="152" height="182" style="margin:10px;"></a>
+        <a><img src="/static/B.jpg" width="152" height="182" style="margin:10px;"></a>
+        <a><img src="/static/C.jpg" width="152" height="182" style="margin:10px;"></a>
+        <a><img src="/static/D.jpg" width="152" height="182" style="margin:10px;"></a>
+</div>
+{% from "includes/_formhelpers.html" import render_field %}
+        <form method="POST" action="">
+          <div class="form-group">
+            {{render_field(form.stname, class_="form-control")}}
+          </div>
+          <div class="form-group">
+            {{render_field(form.vdname, class_="form-control")}}
+          </div>
+          <div class="form-group">
+            {{render_field(form.adname, class_="form-control")}}
+            </div>
+          <div class="form-group">
+            {{render_field(form.temp, class_="form-control")}}
+            </div>
+          <p><input type="submit" class="btn btn-primary" value="Submit"></p>
+        </form>
+{% endblock %}  

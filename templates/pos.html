@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+{% block body %}
+<div class="container">
+    {% from "includes/_formhelpers.html" import render_field %}
+  <form method="POST" action="">
+    <div class="form-group">
+      {{render_field(form.name, class_="form-control")}}
+    </div>
+    <div class="form-group">
+      {{render_field(form.qty, class_="form-control")}}
+    </div>
+    <p><input type="submit" class="btn btn-primary" value="Add to list"></p>
+        </form>
+</div>
+
+      <hr>
+
+{% endblock %}
+
+
