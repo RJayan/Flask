@@ -7,12 +7,7 @@ from flask_qrcode import QRcode
 from flask_mail import Mail, Message
 import smtplib
 import string, os,random
-
-  
-
-#new upload code starts
 from flask_uploads import UploadSet, configure_uploads, IMAGES
-#new upload code ends
 
 app = Flask(__name__)
 QRcode(app)
@@ -23,27 +18,25 @@ app.config['MAIL_USERNAME'] = 'ereceipt25@gmail.com'
 app.config['MAIL_PASSWORD'] = 'receipt123'
 app.config['MAIL_USE_SSL'] = True
 
+#init mail
 mail = Mail(app)
 
 
-#new upload code starts
+# image upload to static/img folder
 photos = UploadSet('photos', IMAGES)
-
 app.config['UPLOADED_PHOTOS_DEST'] = 'static/img'
 configure_uploads(app, photos)
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload():
-    if request.method == 'POST' and 'photo' in request.files:
-        filename = photos.save(request.files['photo'])
-        flash('Successfully Uploaded !', 'success')
-        return redirect(url_for('advupload'))
-    return redirect(url_for('advupload'))
-#new upload code ends
+# # img Upload
+# @app.route('/upload', methods=['GET', 'POST'])
+# @is_logged_in
+# def upload():
+#     if request.method == 'POST' and 'photo' in request.files:
+#         filename = photos.save(request.files['photo'])
+#         flash('Successfully Uploaded !', 'success')
+#         return redirect(url_for('advupload'))
+#     return redirect(url_for('advupload'))
 
-
-
-mail = Mail(app)
 
 # Config MySQL
 app.config['MYSQL_HOST'] = 'localhost'
@@ -51,14 +44,15 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'root'
 app.config['MYSQL_DB'] = 'flaskapp'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+
 # init MYSQL
 mysql = MySQL(app)
-
 
 #Admin
 @app.route('/admin')
 def admin():
     return render_template('admin.html')
+
 #login Dash
 @app.route('/login')
 def login():
@@ -68,7 +62,8 @@ def login():
 @app.route('/')
 def index():
     return render_template('home.html')
-   
+
+#logged in   
 def is_logged_in(f):
     @wraps(f)
     def wrap(*args, **kwargs):
@@ -79,6 +74,15 @@ def is_logged_in(f):
             return redirect(url_for('login'))
     return wrap 
 
+# img Upload
+@app.route('/upload', methods=['GET', 'POST'])
+@is_logged_in
+def upload():
+    if request.method == 'POST' and 'photo' in request.files:
+        filename = photos.save(request.files['photo'])
+        flash('Successfully Uploaded !', 'success')
+        return redirect(url_for('advupload'))
+    return redirect(url_for('advupload'))
 
 #View Store
 @app.route('/view_store')
@@ -140,10 +144,6 @@ def pos(sid,rand):
         names = cur.fetchall()
         total = 0
         for row in names:
-            # print(row['name'])
-            # print(name)
-            # print(result)
-            # print(names)   
             if name == row['name']:
                 cur1 = mysql.connection.cursor()
                 cur1.execute("select price from product where name = %s",[name])
@@ -170,6 +170,7 @@ def pos(sid,rand):
        
     return render_template('pos.html',form=form)
 
+#Add to list
 @app.route('/add_to_list/<string:rand>')
 def add_to_list(rand):
     session['rand']=rand
@@ -200,16 +201,17 @@ def add_to_list(rand):
     # Close connection
     cur.close() 
    
-def is_logged_in(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            flash('Unauthorized, Please login', 'danger')
-            return redirect(url_for('login'))
-    return wrap
+# def is_logged_in(f):
+#     @wraps(f)
+#     def wrap(*args, **kwargs):
+#         if 'logged_in' in session:
+#             return f(*args, **kwargs)
+#         else:
+#             flash('Unauthorized, Please login', 'danger')
+#             return redirect(url_for('login'))
+#     return wrap
 
+#Bill 
 @app.route('/bill/<string:rand>')
 def bill(rand):
     cur = mysql.connection.cursor()
@@ -226,8 +228,9 @@ def bill(rand):
     list_images = os.listdir("static/img")
     print(list_images)
     for images in list_images:
+        
         print(images)
-    print(images)
+    # print(images)
 
 
     cur.execute("SELECT sid from pos")
@@ -258,6 +261,7 @@ def bill(rand):
 
     return render_template('bill.html')
 
+#Qrcode 
 @app.route('/qrcode/<string:rand>', methods=['GET', 'POST'])
 def qrcode(rand):
     form = PosForm(request.form)
@@ -324,7 +328,7 @@ def delete_pos_product(name,rand):
     return redirect(url_for('add_to_list',rand=rand))
 
 
-# Store Details
+# Templates
 @app.route('/template', methods=['GET', 'POST'])
 def template():
     form = StoredetailsForm(request.form)
@@ -352,6 +356,7 @@ def template():
     return render_template('template.html', form=form)
 
 
+#Store Details
 @app.route('/store_details')
 def store_details():
      # Create cursor
@@ -370,7 +375,8 @@ def store_details():
      # Close connection
      cur.close()    
 
-# create store
+
+# Create store
 @app.route('/create_store', methods=['GET', 'POST'])
 @is_logged_in
 def create_store():
@@ -398,6 +404,8 @@ def create_store():
 
     return render_template('add_store.html', form=form)
 
+
+#Store Dashboard
 @app.route('/store_dash')
 @is_logged_in
 def store_dash():
@@ -458,6 +466,7 @@ class StoreForm(Form):
     name = StringField('Store Name', [validators.Length(min=1, max=50)])
     code = StringField('Store Code', [validators.Length(min=1, max=10)])
 
+#Product Creation Form
 class ProductForm(Form):
     sid = StringField('Store ID', [validators.Length(min=1,max=5)])
     name = StringField('Product Name', [validators.Length(min=1,max=50)])
@@ -466,7 +475,7 @@ class ProductForm(Form):
     price = StringField('price', [validators.Length(min=1,max=50)])
     qty = StringField('qty', [validators.Length(min=1,max=50)])    
 
-
+#Pos Form
 class PosForm(Form):
     sid = StringField('Store ID', [validators.Length(min=1,max=5)])
     name = StringField('Product Name', [validators.Length(min=1,max=50)])
@@ -477,7 +486,7 @@ class PosForm(Form):
     total = StringField('total', [validators.Length(min=1,max=50)])    
     qty = StringField('Qty', [validators.Length(min=1,max=50)])
 
-
+#Store Details Form
 class StoredetailsForm(Form):
     stname = StringField('Store Name',[validators.Length(min=1,max=10)])
     vdname = StringField('Vendor Name', [validators.Length(min=1, max=50)])
@@ -485,8 +494,6 @@ class StoredetailsForm(Form):
     temp = StringField('Template', [validators.Length(min=1, max=10)])
     redirect = StringField('Redirect URL', [validators.Length(min=10,max=150)])
 
-
-    
 
 # User Register Admin
 @app.route('/register', methods=['GET', 'POST'])
@@ -716,13 +723,13 @@ def admin_logout():
     flash('You are now logged out', 'success')
     return redirect(url_for('admin_login'))
 
-# Dashboard
+# Admin Dashboard
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
     return render_template('dashboard.html')
  
-#vendor 2nd page
+#vendor Control Page
 @app.route('/vendor_dashboard')
 @is_logged_in
 def vendor_dashboard():
@@ -747,7 +754,6 @@ def vendor_dash():
          return render_template('dashboard.html', msg=msg)
      # Close connection
      cur.close()
-
 
 
 # Employee Dashboard
@@ -790,10 +796,6 @@ def advertiser_dash():
      # Close connection
      cur.close()
 
-# Article Form Class
-class ArticleForm(Form):
-    title = StringField('Title', [validators.Length(min=1, max=200)])
-    body = TextAreaField('Body', [validators.Length(min=30)])
 
 # Add Vendor
 @app.route('/add_vendor', methods=['GET', 'POST'])
@@ -890,32 +892,6 @@ def add_advertiser():
     return render_template('add_advertiser.html', form=form)   
 
 
-# Add Article
-@app.route('/add_article', methods=['GET', 'POST'])
-@is_logged_in
-def add_article():
-    form = ArticleForm(request.form)
-    if request.method == 'POST' and form.validate():
-        title = form.title.data
-        body = form.body.data
-
-        # Create Cursor
-        cur = mysql.connection.cursor()
-
-        # Execute
-        cur.execute("INSERT INTO articles(title, body, author) VALUES(%s, %s, %s)",(title, body, session['username']))
-
-        # Commit to DB
-        mysql.connection.commit()
-
-        #Close connection
-        cur.close()
-
-        flash('Article Created', 'success')
-
-        return redirect(url_for('dashboard'))
-
-    return render_template('add_article.html', form=form)
 
 # Edit Advertiser
 @app.route('/edit_advertiser/<string:id>', methods=['GET', 'POST'])
@@ -1028,7 +1004,7 @@ def delete_advertiser(id):
 
     return redirect(url_for('advertiser_dash'))
 
-# Delete Article
+# Delete Product
 @app.route('/delete_product/<string:sid>/<string:name>', methods=['POST'])
 @is_logged_in
 def delete_product(sid,name):
